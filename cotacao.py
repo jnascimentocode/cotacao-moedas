@@ -1,6 +1,5 @@
 from datetime import datetime
 import requests
-from requests.api import request
 import PySimpleGUI as  sg
 
 requisicao = requests.get('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL')
@@ -22,7 +21,8 @@ class TelaCotacao:
             [sg.Text('EUR:', size=(10,0)), sg.Text('', key='euro')],
             [sg.Text('BTC:', size=(10,0)), sg.Text('', key='bitcoin')],
             [sg.Text('DATA:' , size=(10,0)), sg.Text('', key='data')], 
-            [sg.Button('Atualizar', size=(30,0))]       
+            [sg.Button('Visualizar', size=(30,0))],
+            [sg.Button('Salvar Cotação', size=(30,0))]       
         ]
 
         self.janela = sg.Window('COTAÇÃO DO DIA', layout)
@@ -37,10 +37,14 @@ class TelaCotacao:
             data = datetime.now()
             dataformat = (data.strftime('%d-%m-%Y %H:%M'))
 
-            self.janela['dolar'].update(cotacao_USD)
-            self.janela['euro'].update(cotacao_EUR)
-            self.janela['bitcoin'].update(cotacao_BTC)
+            self.janela['dolar'].update('R$ '+ cotacao_USD)
+            self.janela['euro'].update('R$ '+ cotacao_EUR)
+            self.janela['bitcoin'].update('R$ '+ cotacao_BTC)
             self.janela['data'].update(dataformat)
+
+            if events == 'Salvar Cotação':
+                with open('cotacao.txt', 'a') as arquivo:
+                    arquivo.write(f'DATA: {dataformat} - USD {cotacao_USD} - EUR {cotacao_EUR} - BITCOIN {cotacao_BTC}\n')
 
 tela = TelaCotacao()
 tela.Iniciar()
